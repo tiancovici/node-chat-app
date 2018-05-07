@@ -23,10 +23,11 @@ io.on('connection', (socket)=> {
   // Introduce user to rest of users
   socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
 
-  socket.on('createMessage', (message) => {
+  socket.on('createMessage', (message, callback) => {
     console.log('createMessage: ', message);
     //Send message to everyone
     io.emit('newMessage', generateMessage(message.from, message.text));
+    if(callback) callback('This is from the server');
   });
 
 
