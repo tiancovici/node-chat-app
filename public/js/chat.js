@@ -3,6 +3,15 @@ var socket = io();
 socket.on('connect', function () {
   console.log('Connected to server');
 
+  let params = jQuery.deparam(window.location.search);
+  socket.emit('join', params, function(err) {
+    if(err) {
+      alert(err);
+      window.location.href = '/'
+    } else {
+
+    }
+  });
 });
 
 function scrollToBottom() {
@@ -22,10 +31,11 @@ function scrollToBottom() {
   }
 }
 
+//// D i s c o n n e c t /////
 socket.on('disconnect', function () {
   console.log('Disconnected from server');
 });
-
+/// N e w    M e s s a g e ////
 socket.on('newMessage', function (message) {
   let formattedTime = moment(message.createdAt).format('h:mm a');
   let template = jQuery('#message-template').html();
@@ -39,6 +49,16 @@ socket.on('newMessage', function (message) {
   scrollToBottom();
 });
 
+/// U p d a t e     U s e r    L i s t ////
+socket.on('updateUserList', function(users) {
+  let ol = jQuery('<ol></ol>');
+  users.forEach(function(user) {
+    ol.append(jQuery('<li></li>').text(user));
+  });
+
+  jQuery('#users').html(ol);
+});
+// N e w    L o c a t i o n ////
 socket.on('newLocationMessage', function (message) {
   // console.log('newLocation', message);
   let formattedTime = moment(message.createdAt).format('h:mm a');
