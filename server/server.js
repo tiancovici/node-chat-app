@@ -69,15 +69,23 @@ io.on('connection', (socket)=> {
 
   /// C r e a t e    M e s s a g e ////
   socket.on('createMessage', (message, callback) => {
-    // console.log('createMessage: ', message);
-    //Send message to everyone
-    io.emit('newMessage', generateMessage(message.from, message.text));
+    let user = users.getUser(socket.id);
+    if(user && isRealString(message.text)) {
+      //Send message to everyone
+      // io.emit('newMessage', generateMessage(users.getUser(socket.id), message.text));
+      //Send message to room only
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
     if(callback) callback('This is from the server');
   });
 
   /// C r e a t e   L o c a t i o n    M e s s a g e ////
   socket.on('createLocationMessage', (coords)=> {
-    io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude,coords.longitude))
+    let user = users.getUser(socket.id);
+    if(user) {
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude,coords.longitude))
+    }
+    //io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude,coords.longitude))
   });
 });
 
